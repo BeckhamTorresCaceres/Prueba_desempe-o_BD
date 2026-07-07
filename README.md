@@ -1,35 +1,48 @@
-# Prueba_desempe-o_BD
-# Service Order Database
+# 🛠️ Technical Support Order Management System
 
-## 1. What is this?
-I built this database to manage technical service orders. It tracks **who** (client), **where** (city/branch), **what** (equipment), and **who fixed it** (technician). Its main purpose is to store service history and generate reports to improve our work distribution.
+This project contains the relational design and the database to control the history of maintenance, installations and repairs of technological equipment of different corporate clients.
 
-## 2. Tools Used
-*   **Database:** PostgreSQL
+## 📊 Database Architecture
 
-## 3. How I Organized the Data
-I separated the information into logical tables to avoid repeating data:
-*   **People & Places:** Tables for `client`, `technician`, `branch`, and `City`.
-*   **Items & Services:** Tables for `equipament`, `category`, and `servicesType`.
-*   **The Action:** The `invoice` table is where everything comes together to record a specific job done (date, cost, hours).
-*   **Connections:** I used extra tables (`city_branch`, `category_services`) only to link related items correctly.
+The design follows a **Star Model** architecture optimized for analytics, where the master tables (dimensions) feed into a central fact table called `INVOICE`.
 
-## 5. How to Run It
-You need PostgreSQL installed. Then, just run these two steps:
+* **Facts (Central):** `INVOICE` (Records hours, costs and dates of each work order).
+* **Dimensions (Catalogs):** `CUSTOMER`, `TECHNICIAN`, `TYPE OF SERVICE`, `CATEGORY`, `BRANCH` and `CITY`.
 
-**Step 1: Create the structure**
-Copy the code from my `schema.sql` file (the `CREATE TABLE` parts) and run it in your database tool. This creates all the empty tables.
+---
 
-**Step 2: Add data**
-Copy the `INSERT` statements from my `data.sql` file and run them.
-*Note: Add data in this order: Cities/Branches first, then Clients/Technicians/Equipment, and finally the Invoices.*
+## 🚀 How to Get Started
 
-## 6. The Reports I Created
-I wrote 6 simple queries to answer important business questions:
+### 1. Prerequisites
+* Have **PostgreSQL** installed (version 13 or higher recommended).
+* A database manager such as **pgAdmin**, **DBeaver** or the psql console.
 
-1.  **Work per Technician:** Counts how many jobs each technician has done.
-2.  **Jobs per City:** Shows which cities request the most service.
-3.  **Popular Services:** Tells us which types of service are requested most often.
-4.  **Problematic Equipment:** Lists the specific machines that break down the most.
-5.  **Top Clients:** Identifies our most frequent customers.
-6.  **Work per Branch:** Shows which office location is the busiest.   
+### 2. Steps to Assemble the Project
+
+1. **Create the Tables:** Run your DDL script in order (first the standalone catalogs, then the hierarchies like branches and teams, and finally the `INVOICE` table).
+2. **Populate the Catalogs:** Insert the master data of clients, technicians, cities, etc.
+3. **Load History:** Executes the `INVOICE` insert block (numeric IDs cross and clean up inconsistencies from the original Excel automatically).
+
+---
+
+## 📈 Report Queries
+
+The project includes a file called `queries.sql` with 6 key queries prepared to answer the specific needs of company leaders:
+
+1. **Workload:** Number of orders attended to by each technician (Support Coordinator).
+2. **Regional Expansion:** History of services organized by city (Regional Manager).
+3. **Demand Analysis:** Most requested services by type of support (Operational Director).
+4. **Hardware Quality:** Equipment that requires maintenance more frequently (Support Analyst).
+5. **VIP Loyalty:** Customers with the highest number of orders generated (Commercial Director).
+6. **Operational Load by Headquarters:** Flow of orders managed by each branch (Operations Manager).
+
+---
+
+## 🧹 Environment Maintenance (Reset)
+
+If you need to completely empty the database to retest from scratch without breaking relationships or damaging the table structure, run the following command:
+
+```sql
+TRUNCATED TABLE
+INVOICE, BRANCH, TEAM, CITY, CUSTOMER, TECHNICIAN, TYPE OF SERVICE, CATEGORY
+RESET IDENTITY CASCADE;
